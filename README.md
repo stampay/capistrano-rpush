@@ -6,7 +6,7 @@
 
 ## Rpush
 
-This gem was developed against version 2.7.0. Additionally it only provides tasks over a subset of available commands:
+This gem was developed against version 3.0.0. Additionally it only provides tasks over a subset of available commands:
 
     $ rpush --help
 ```
@@ -85,4 +85,3 @@ Bug reports and pull requests are welcome on GitHub at https://github.com/juicyp
 ## License
 
 The gem is available as open source under the terms of the [MIT License](http://opensource.org/licenses/MIT).
-
