@@ -1,25 +1,5 @@
-namespace :load do
-  set :rpush_default_hooks, -> { true }
-  set :rpush_role,          :app
-  set :rpush_env,           -> { fetch(:rack_env, fetch(:rails_env, fetch(:stage))) }
-  set :rpush_conf,          -> { File.join(shared_path, 'config', 'rpush.rb') }
-  set :rpush_log,           -> { File.join(shared_path, 'log', 'rpush.log') }
-  set :rpush_pid,           -> { File.join(shared_path, 'tmp', 'pids', 'rpush.pid') }
-end
-
-namespace :deploy do
-  before :starting, :check_rpush_hooks do
-    invoke 'rpush:add_default_hooks' if fetch(:rpush_default_hooks)
-  end
-end
-
 namespace :rpush do
-
-  task :add_default_hooks do
-    after 'deploy:check',    'rpush:check'
-    after 'deploy:finished', 'rpush:restart'
-  end
-
+  desc 'Check if config file exists'
   task :check do
     on roles (fetch(:rpush_role)) do |role|
       unless  test "[ -f #{fetch(:rpush_conf)} ]"
@@ -52,7 +32,7 @@ namespace :rpush do
         end
         within current_path do
           with rack_env: fetch(:rpush_env) do
-            execute :bundle, :exec, "rpush start -p #{fetch(:rpush_pid)} -c #{fetch(:rpush_conf)} -e #{fetch(:rpush_env)}"
+            execute :rpush, "start -p #{fetch(:rpush_pid)} -c #{fetch(:rpush_conf)} -e #{fetch(:rpush_env)}"
           end
         end
       end
@@ -66,7 +46,7 @@ namespace :rpush do
         if test "[ -f #{fetch(:rpush_conf)} ]"
           within current_path do
             with rack_env: fetch(:rpush_env) do
-              execute :bundle, :exec, "rpush status -c #{fetch(:rpush_conf)} -e #{fetch(:rpush_env)}"
+              execute :rpush, "status -c #{fetch(:rpush_conf)} -e #{fetch(:rpush_env)}"
             end
           end
         end
@@ -81,7 +61,7 @@ namespace :rpush do
         if test "[ -f #{fetch(:rpush_pid)} ]"
           within current_path do
             with rack_env: fetch(:rpush_env) do
-              execute :bundle, :exec, "rpush stop -p #{fetch(:rpush_pid)} -c #{fetch(:rpush_conf)} -e #{fetch(:rpush_env)}"
+              execute :rpush, "stop -p #{fetch(:rpush_pid)} -c #{fetch(:rpush_conf)} -e #{fetch(:rpush_env)}"
             end
           end
         end
@@ -107,5 +87,4 @@ namespace :rpush do
     properties.fetch(:run_as) ||      # global property across multiple capistrano gems
     role.user
   end
-
 end

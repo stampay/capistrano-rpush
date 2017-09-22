@@ -47,8 +47,15 @@ Or install it yourself as:
 ```ruby
   # In Rails.root/Capfile
 
+  require 'capistrano/rpush'
+  install_plugin Capistrano::Rpush
+```
+Or, to install the plugin without its hooks:
+```ruby
+  # In Rails.root/Capfile
 
   require 'capistrano/rpush'
+  install_plugin Capistrano::RPush, load_hooks: false
 ```
 
 Now you can use cap -T to list tasks:
@@ -65,7 +72,7 @@ cap rpush:stop     # Stop rpush
 The following configurable options are available, and listed with their defaults. Override them to suit your project's needs:
 
 ```ruby
-  set :rpush_role, :app
+  set :rpush_role, :app 
   set :rpush_env,  -> { fetch(:rack_env, fetch(:rails_env, fetch(:stage))) }
   set :rpush_conf, -> { File.join(shared_path, 'config', 'rpush.rb') }
   set :rpush_log,  -> { File.join(shared_path, 'log', 'rpush.log') }
