@@ -2,7 +2,30 @@ require 'capistrano/bundler'
 require 'capistrano/plugin'
 
 module Capistrano
+  module RpushCommon
+    def rpush_switch_user(role, &block)
+      user = rpush_user(role)
+      if user == role.user
+        block.call
+      else
+        as user do
+          block.call
+        end
+      end
+    end
+
+    def rpush_user(role)
+      properties = role.properties
+      properties.fetch(:rpush_user) ||  # local property for rpush only
+      fetch(:rpush_user) ||
+      properties.fetch(:run_as) ||      # global property across multiple capistrano gems
+      role.user
+    end
+  end
+
   class Rpush < Capistrano::Plugin
+    include RpushCommon
+
     def define_tasks
       eval_rakefile File.expand_path('../tasks/rpush.rake', __FILE__)
     end
